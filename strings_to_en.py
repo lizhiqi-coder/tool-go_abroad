@@ -37,17 +37,18 @@ def get_content_range_in_xlsx(row_num):
 
 # 读取已翻译过的xlsx文件，返回中文字典，英文字典，中文顺序关键词列表，英文顺序关键词列表
 def read_xlsx_file(file_path):
+    global CN_map, EN_map, CN_key_list, EN_key_list
     cleanBuffer()
     wb = openpyxl.load_workbook(filename=file_path, use_iterators=True)
     sheet_names = wb.get_sheet_names()
     head_sheet = wb.get_sheet_by_name(sheet_names[0])
     # LAST_LINE_IN_XLSX = head_sheet.max_row
-    print CONTENT_RANGE_IN_XLSX
     for row in head_sheet.iter_rows(get_content_range_in_xlsx(head_sheet.max_row)):
         key = row[0].value
 
         if (key == None or key == TITLE_ANDROID_KEY):
             continue
+        # print  'CN_key_list', CN_key_list
         CN_key_list.append(key)
         EN_key_list.append(key)
         CN_value = row[1].value
@@ -95,6 +96,7 @@ def write_to_xlsx_file(content, keys, file_path):
 
 # 规定读取中文xml 文件,返回中文字典，关键词顺序列表
 def read_xml_file(file_path):
+    global CN_map, EN_map, CN_key_list, EN_key_list
     cleanBuffer()
     xml_tree = parse(file_path)
     resources = xml_tree.documentElement
@@ -158,12 +160,11 @@ def generate_PM_xlsx_file(content, key_list):
 
 
 def cleanBuffer():
+    global EN_map, CN_map, CN_key_list, EN_key_list
     EN_map.clear()
     CN_map.clear()
-    for i in CN_key_list:
-        CN_key_list.remove(i)
-    for j in EN_key_list:
-        EN_key_list.remove(j)
+    CN_key_list = []
+    EN_key_list = []
     return
 
 
@@ -176,7 +177,6 @@ def createFile(file_name):
 # content = {'one': '1', 'two': '2', 'three': '3'}
 
 if (__name__ == "__main__"):
-
     print 'this is cn_map', CN_map
     print 'this is cn_key_list', CN_key_list
 
@@ -189,4 +189,3 @@ if (__name__ == "__main__"):
     generate_android_strings_file(EN_map, CN_key_list, CN_map)
 
     print 'succeed'
-
