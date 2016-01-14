@@ -1,5 +1,5 @@
 # coding=utf-8
-from strings_to_en import *
+from go_abroad_core import *
 
 if (__name__ == "__main__"):
     global EN_map, CN_map, CN_key_list, EN_key_list

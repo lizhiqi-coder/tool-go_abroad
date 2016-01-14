@@ -1,5 +1,5 @@
 # coding=utf-8
-from strings_to_en import *
+from go_abroad_core import *
 import copy
 
 if (__name__ == "__main__"):

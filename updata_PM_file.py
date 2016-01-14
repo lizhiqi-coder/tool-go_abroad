@@ -1,7 +1,7 @@
 # coding=utf-8
 import openpyxl
 import copy
-from strings_to_en import *
+from go_abroad_core import *
 
 OLD_FILE_PATH_XLSX = 'strings_old.xlsx'
 NEW_FILE_PATH_XLSX = 'strings.xlsx'
