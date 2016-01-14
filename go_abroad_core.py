@@ -6,9 +6,10 @@ from xml.dom.minidom import parse
 import openpyxl
 from openpyxl.writer.excel import ExcelWriter
 
-global CN_map, EN_map, CN_key_list, EN_key_list
+global CN_map, EN_map, CN_key_list, EN_key_list, REMARKS_MAP
 CN_map = {}
 EN_map = {}
+REMARKS_MAP = {}
 CN_key_list = []
 EN_key_list = []
 
@@ -19,26 +20,28 @@ GENERATE_ANDROID_STRINGS_FILE = "strings_en.xml"
 ANDROID_KEY_COLUMN_IN_XLSX = 'B'
 CN_VALUE_COLUMN_IN_XLSX = 'C'
 EN_VALUE_COLUMN_IN_XLSX = 'D'
+REMARKS_COLUMN_IN_XLSX = 'E'
 
 FIRST_LINE_IN_XLSX = '1'
 LAST_LINE_IN_XLSX = '1000'
 
-CONTENT_RANGE_IN_XLSX = ANDROID_KEY_COLUMN_IN_XLSX + FIRST_LINE_IN_XLSX + ':' + EN_VALUE_COLUMN_IN_XLSX + LAST_LINE_IN_XLSX
+CONTENT_RANGE_IN_XLSX = ANDROID_KEY_COLUMN_IN_XLSX + FIRST_LINE_IN_XLSX + ':' + REMARKS_COLUMN_IN_XLSX + LAST_LINE_IN_XLSX
 
 TITLE_ANDROID_KEY = 'android_key'
 TITLE_CN_STRING_VALUE = 'CN_String_value'
 TITLE_EN_STRING_VALUE = 'EN_String_value'
+TITLE_REMARKS = "REMAKES"
 
 
 def get_content_range_in_xlsx(row_num):
     LAST_LINE_IN_XLSX = str(row_num)
-    CONTENT_RANGE_IN_XLSX = ANDROID_KEY_COLUMN_IN_XLSX + FIRST_LINE_IN_XLSX + ':' + EN_VALUE_COLUMN_IN_XLSX + LAST_LINE_IN_XLSX
+    CONTENT_RANGE_IN_XLSX = ANDROID_KEY_COLUMN_IN_XLSX + FIRST_LINE_IN_XLSX + ':' + REMARKS_COLUMN_IN_XLSX + LAST_LINE_IN_XLSX
     return CONTENT_RANGE_IN_XLSX
 
 
 # 读取已翻译过的xlsx文件，返回中文字典，英文字典，中文顺序关键词列表，英文顺序关键词列表
 def read_xlsx_file(file_path):
-    global CN_map, EN_map, CN_key_list, EN_key_list
+    global CN_map, EN_map, CN_key_list, EN_key_list, REMARKS_MAP
     cleanBuffer()
     wb = openpyxl.load_workbook(filename=file_path, use_iterators=True)
     sheet_names = wb.get_sheet_names()
@@ -54,6 +57,7 @@ def read_xlsx_file(file_path):
         EN_key_list.append(key)
         CN_value = row[1].value
         EN_value = row[2].value
+        REMARKS_value = row[3].value
         if CN_value != None:
             CN_map[key] = CN_value.encode('utf-8')
         else:
@@ -64,7 +68,12 @@ def read_xlsx_file(file_path):
         else:
             EN_map[key] = EN_value
 
-    return CN_map, EN_map, CN_key_list, EN_key_list
+        if REMARKS_value != None:
+            REMARKS_MAP[key] = REMARKS_value.encode('utf-8')
+        else:
+            REMARKS_MAP[key] = REMARKS_value
+
+    return CN_map, EN_map, CN_key_list, REMARKS_MAP
 
 
 def write_to_xlsx_file(content, keys, file_path):
@@ -84,6 +93,7 @@ def write_to_xlsx_file(content, keys, file_path):
     rows[0][0].value = TITLE_ANDROID_KEY
     rows[0][1].value = TITLE_CN_STRING_VALUE
     rows[0][2].value = TITLE_EN_STRING_VALUE
+    rows[0][3].value = TITLE_REMARKS
 
     for i in range(0, keys.__len__()):
         rows[i + 1][0].value = keys[i]
@@ -97,7 +107,7 @@ def write_to_xlsx_file(content, keys, file_path):
 
 # 规定读取中文xml 文件,返回中文字典，关键词顺序列表
 def read_xml_file(file_path):
-    global CN_map, EN_map, CN_key_list, EN_key_list
+    global CN_map, EN_map, CN_key_list, EN_key_list, REMARKS_MAP
     cleanBuffer()
     xml_tree = parse(file_path)
     resources = xml_tree.documentElement
@@ -161,7 +171,8 @@ def generate_PM_xlsx_file(content, key_list):
 
 
 def cleanBuffer():
-    global EN_map, CN_map, CN_key_list, EN_key_list
+    global EN_map, CN_map, CN_key_list, EN_key_list, REMARKS_MAP
+    REMARKS_MAP.clear()
     EN_map.clear()
     CN_map.clear()
     CN_key_list = []
