@@ -6,6 +6,7 @@ from xml.dom.minidom import parse
 import openpyxl
 from openpyxl.writer.excel import ExcelWriter
 
+global CN_map, EN_map, CN_key_list, EN_key_list
 CN_map = {}
 EN_map = {}
 CN_key_list = []
